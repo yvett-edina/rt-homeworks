@@ -1,6 +1,7 @@
 package ssatr.device;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * TASK APERIODIC: execută comenzile primite de la business service.
@@ -46,5 +47,50 @@ public class AperiodicCommandTask implements Runnable {
         //     oprească taskul: publicați "ERROR <motiv>"
         //
         // Vezi exemplul exemple/01-taskuri/.../AperiodicTaskExample.java
+
+        while(!Thread.currentThread().isInterrupted()) {
+            String cmd;
+
+            try {
+                cmd = commands.take();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+
+            String response;
+            String cmdName = cmd.split(" ")[0];
+            System.out.println("Comanda primită: [" + cmd + "]");
+
+            switch (cmdName) {
+                case "SET_INTERVAL":
+                    long period = Long.parseLong(cmd.split(" ")[1]);
+                    periodic.setPeriodMs(period);
+                    response = "OK SET_INTERVAL " + period;
+                    break;
+
+                case "SET_THRESHOLD":
+                    double threshold = Double.parseDouble(cmd.split(" ")[1]);
+                    periodic.setThreshold(threshold);
+                    response = "OK SET_THRESHOLD " + threshold;
+                    break;
+
+                case "RESET":
+                    sensor.reset();
+                    response = "OK RESET";
+                    break;
+
+                case "STATUS":
+                    response = "OK STATUS periodMs=" + periodic.getPeriodMs() + " threshold=" + periodic.getThreshold();
+                    break;
+
+                default:
+                    response ="ERROR: Unknown command";
+                    break;
+            }
+
+            String message = deviceId + ";" + System.currentTimeMillis() + ";" + response;
+            mqtt.publish(Config.statusTopic(deviceId), message);
+        }
     }
 }

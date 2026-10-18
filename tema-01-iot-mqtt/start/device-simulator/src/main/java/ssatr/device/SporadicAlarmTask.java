@@ -18,11 +18,13 @@ public class SporadicAlarmTask implements Runnable {
     private final String deviceId;
     private final MqttConnection mqtt;
     private final BlockingQueue<Double> alarmEvents;
+    private final PeriodicTelemetryTask periodic;
 
-    public SporadicAlarmTask(String deviceId, MqttConnection mqtt, BlockingQueue<Double> alarmEvents) {
+    public SporadicAlarmTask(String deviceId, MqttConnection mqtt, BlockingQueue<Double> alarmEvents, PeriodicTelemetryTask periodic) {
         this.deviceId = deviceId;
         this.mqtt = mqtt;
         this.alarmEvents = alarmEvents;
+        this.periodic = periodic;
     }
 
     @Override
@@ -37,5 +39,29 @@ public class SporadicAlarmTask implements Runnable {
         //      citit din PeriodicTelemetryTask; alegeți și justificați în raport)
         //
         // Vezi exemplul exemple/01-taskuri/.../SporadicTaskExample.java
+
+        long lastRelease = 0;
+
+        while(!Thread.currentThread().isInterrupted()) {
+            double temp;
+
+            try {
+                temp = alarmEvents.take();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+
+            long sinceLast = System.currentTimeMillis() - lastRelease;
+
+            if (sinceLast < MIN_INTERARRIVAL_MS) {
+                System.out.printf("   [sporadic] ALARMA RESPINSA: au trecut doar %d ms (interval minim %d ms)%n", sinceLast, MIN_INTERARRIVAL_MS);
+                continue;
+            }
+
+            lastRelease = System.currentTimeMillis();
+
+            mqtt.publish(Config.alarmTopic(deviceId), deviceId + ";" + System.currentTimeMillis() + ";" + temp + ";" + periodic.getThreshold());
+        }
     }
 }

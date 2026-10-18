@@ -28,5 +28,6 @@ public class TemperatureSensor {
 
     public synchronized void reset() {
         value = INITIAL;
+        System.out.println("Senzor resetat la " + INITIAL + " °C");
     }
 }
