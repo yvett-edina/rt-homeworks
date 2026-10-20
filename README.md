@@ -9,7 +9,7 @@ Fiecare temă se află într-un subfolder separat și conține enunțul (`README
 | Nr. | Temă | Tehnologii |
 |-----|------|------------|
 | 01  | [Aplicație IoT cu taskuri periodice, sporadice și aperiodice](tema-01-iot-mqtt/) | Java, MQTT, diagrame UML |
-| 02  | | |
+| 02  | [Device IoT pe ESP32-C3 cu taskuri FreeRTOS](tema-02-esp32-mqtt/) | ESP32-C3, Arduino, FreeRTOS, MQTT |
 | 03  | | |
 | 04  | | |
 
@@ -33,7 +33,7 @@ Fiecare temă se află într-un subfolder separat și conține enunțul (`README
 - **MQTTX** 
 - **draw.io**
 - client **SSH**
-- placă de dezvoltare **ESP32**
+- placă de dezvoltare **ESP32-C3 Super Mini** și cablu USB-C de date
 
 ## Structura unei teme
 
