@@ -207,7 +207,7 @@ void aperiodic_command_task(void* parameter) {
         }
         else if (strcmp(cmdName, "SET_INTERVAL") == 0) {
             // Acceptăm un singur parametru numeric pozitiv.
-            if (arg == nullptr || extra != nullptr {
+            if (arg == nullptr || extra != nullptr) {
                 snprintf(response, sizeof(response),
                         "ERROR SET_INTERVAL necesita un argument");
             } else {
